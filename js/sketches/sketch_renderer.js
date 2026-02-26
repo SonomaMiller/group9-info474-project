@@ -19,6 +19,7 @@
         },
 
         draw: function (p, manager, ai, progress) {
+            console.log("Active index ", ai)
             try { console.log('Renderer: delegating draw, ai=', ai); } catch (e) { }
 
             if (ai === 0 || ai === 1) {
@@ -32,6 +33,11 @@
             }
 
             if (ai === 7) {
+                window.VizMountain.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if(ai > 7) {
                 window.VizBar.draw(p, manager, ai, progress);
                 return;
             }
