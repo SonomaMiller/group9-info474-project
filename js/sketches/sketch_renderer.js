@@ -7,6 +7,9 @@
         setData: function (manager) {
             var self = this;
 
+            manager.tempTable = manager.p5.loadTable('temperature_clean.csv', 'csv', 'header');
+            manager.precipTable = manager.p5.loadTable('precipitation_clean.csv', 'csv', 'header');
+
             manager.offsetX = (manager.margin && manager.margin.left) || 20;
             manager.offsetY = (manager.margin && manager.margin.top) || 0;
 
@@ -38,7 +41,7 @@
             }
 
             if(ai > 7) {
-                window.VizBar.draw(p, manager, ai, progress);
+                window.heatmap.draw(p, manager, ai, progress);
                 return;
             }
         }
