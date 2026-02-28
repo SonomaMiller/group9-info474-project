@@ -36,7 +36,7 @@
             p.line(margin, margin, margin, margin + h);
             p.line(margin, margin + h, margin + w, margin + h);
 
-            // draw y-ticks and labels
+            // draw y-ticks and scale
             let numYTicks = 14;
             let range = maxTempF - minTempF;
             for (let i = 0; i <= numYTicks; i++) {
@@ -65,7 +65,7 @@
                 p.line(x1, y1, x2, y2);
             }
 
-            // draw x-labels
+            // draw x scale
             // don't know if I want ticks here.
             for (let i = 0; i < numberOfRows; i += 10) {
                 let x = margin + (i / (numberOfRows - 1)) * w;
@@ -75,6 +75,19 @@
                 p.textAlign(p.CENTER, p.TOP);
                 p.text(years[i], x, margin + h + 5);
             }
+
+            // draw x- and y-labels
+            p.push();
+
+            p.translate(margin - 45, margin + h / 2);
+            p.rotate(-p.HALF_PI);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text("Temperature (°F)", 0, 0);
+
+            p.pop();
+
+            p.textAlign(p.CENTER, p.BOTTOM);
+            p.text("Year", margin + w / 2, margin + h + 35);
 
         }
     };
