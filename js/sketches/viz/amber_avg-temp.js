@@ -36,6 +36,24 @@
             p.line(margin, margin, margin, margin + h);
             p.line(margin, margin + h, margin + w, margin + h);
 
+            // draw y-ticks and labels
+            let numYTicks = 14;
+            let range = maxTempF - minTempF;
+            for (let i = 0; i <= numYTicks; i++) {
+                let t = i / numYTicks;
+                let value = minTempF + t * range;
+                let y = margin + h - t * h;
+                
+                p.strokeWeight(0.1);
+                p.line(margin - 5, y, margin + w, y);
+                
+                p.noStroke();
+                p.strokeWeight(0.4);
+                p.textSize(12);
+                p.text(value.toFixed(1), margin - 20, y);
+                p.stroke(0);
+            }
+
             // draw line
             p.stroke(80, 120, 200);
             p.strokeWeight(1);
@@ -48,12 +66,13 @@
             }
 
             // draw x-labels
-            p.stroke(0);
-            p.strokeWeight(0.5);
-            p.textSize(10);
-            p.textAlign(p.CENTER, p.TOP);
+            // don't know if I want ticks here.
             for (let i = 0; i < numberOfRows; i += 10) {
                 let x = margin + (i / (numberOfRows - 1)) * w;
+                p.noStroke();
+                p.strokeWeight(0.1);
+                p.textSize(10);
+                p.textAlign(p.CENTER, p.TOP);
                 p.text(years[i], x, margin + h + 5);
             }
 
