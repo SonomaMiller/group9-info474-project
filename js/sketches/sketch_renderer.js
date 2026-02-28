@@ -7,6 +7,7 @@
         setData: function (manager) {
             var self = this;
 
+            manager.avgTempTable = manager.p5.loadTable('washington_avg_temp_clean.csv', 'csv', 'header');
             manager.tempTable = manager.p5.loadTable('temperature_clean.csv', 'csv', 'header');
             manager.precipTable = manager.p5.loadTable('precipitation_clean.csv', 'csv', 'header');
 
@@ -30,7 +31,12 @@
                 return;
             }
 
-            if (ai >= 4 && ai < 7) {
+            if (ai === 4) {
+                window.Amber_AvgTemp.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai >= 5 && ai < 7) {
                 window.VizScatter.draw(p, manager, ai, progress);
                 return;
             }
