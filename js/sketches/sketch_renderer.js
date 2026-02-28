@@ -7,7 +7,7 @@
         setData: function (manager) {
             var self = this;
 
-            manager.avgTempTable = manager.p5.loadTable('washington_avg_temp_clean.csv', 'csv', 'header');
+            manager.avgTempTable = manager.p5.loadTable('data/washington_avg_temp_clean.csv', 'csv', 'header');
             manager.tempTable = manager.p5.loadTable('temperature_clean.csv', 'csv', 'header');
             manager.precipTable = manager.p5.loadTable('precipitation_clean.csv', 'csv', 'header');
 
