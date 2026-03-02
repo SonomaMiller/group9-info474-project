@@ -29,7 +29,7 @@
             p.rect(skyX, skyY, skyW, skyH, 8);
 
 
-            // Draw mountain 
+            // Draw mountain
             p.fill(90, 140, 180);
             p.beginShape();
 
