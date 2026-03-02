@@ -46,7 +46,7 @@
                 return;
             }
 
-            if(ai > 7) {
+            if(ai === 8) {
                 window.heatmap.draw(p, manager, ai, progress);
                 return;
             }
