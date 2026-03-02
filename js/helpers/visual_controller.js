@@ -7,13 +7,14 @@
         this.visEl = document.querySelector(opts.visSelector || '#vis');
         // predicate(activeIndex) -> boolean whether the visual should be visible
         // Use an explicit check for opts.showAt so a configured 0 is respected
-        var showAtVal = (typeof opts.showAt === 'number') ? opts.showAt : 2;
+        var showAtVal = (typeof opts.showAt === 'number') ? opts.showAt : 0;
         this.predicate = opts.predicate || function (i) { return i >= showAtVal; };
         this._visible = false;
     }
 
     VisualController.prototype._setVisible = function (visible, detail) {
         if (!this.visEl) return;
+        if (visible === this._visible) return;
         if (visible) {
             this.visEl.classList.remove('vis-hidden');
             this.visEl.classList.add('vis-visible');

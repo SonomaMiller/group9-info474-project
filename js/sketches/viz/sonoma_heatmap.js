@@ -1,5 +1,5 @@
 (function () {
-    window.heatmap = {
+    window.sonoma_heatmap = {
         draw: function (p, manager, ai, progress) {
             // Safety check: ensure tables are loaded
             if (!manager.tempTable || !manager.precipTable) return;

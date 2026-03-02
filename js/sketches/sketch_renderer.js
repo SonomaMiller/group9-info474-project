@@ -46,8 +46,13 @@
                 return;
             }
 
-            if(ai === 8) {
-                window.heatmap.draw(p, manager, ai, progress);
+            if (ai === 8) {
+                window.sonoma_heatmap.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 9) {
+                window.sonoma_3d.draw(p, manager, ai, progress);
                 return;
             }
         }
