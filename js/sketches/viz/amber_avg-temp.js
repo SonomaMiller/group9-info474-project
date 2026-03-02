@@ -23,7 +23,7 @@
 
             const minTempF = Math.min(...tempF) - 0.2;
             const maxTempF = Math.max(...tempF) + 0.2;
-            
+
             p.background(210);
             p.fill(0);
             p.stroke(0);
@@ -43,10 +43,10 @@
                 let t = i / numYTicks;
                 let value = minTempF + t * range;
                 let y = margin + h - t * h;
-                
+
                 p.strokeWeight(0.1);
                 p.line(margin - 5, y, margin + w, y);
-                
+
                 p.noStroke();
                 p.strokeWeight(0.4);
                 p.textSize(12);
