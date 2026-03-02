@@ -20,38 +20,39 @@
             p.translate(margin, margin);
 
             for (let i = 0; i < rowCount; i++) {
-                // Extract Year from Date (e.g., "Jan-1895")
+                // Extract Year from Date (e.g., "01-1895")
                 let dateStr = tempTable.getString(i, 0);
                 if (!dateStr) continue;
 
                 let dateParts = dateStr.split('-');
-                // Handles "1895" or "Jan-1895"
-                let year = parseInt(dateParts[dateParts.length - 1]);
+                let year = parseInt(dateParts[1]);
 
                 // Extract Values
                 let tempF = tempTable.getNum(i, 1);
                 // Use i to match the row in precipTable
                 let precipInches = precipTable.getNum(i, 1);
 
-                // 3. Mapping
-                // X = Year, Y = Precipitation
+                if (i === 0) {
+                    console.log(`Row 0 debug: Date=${dateStr}, Year=${year}, Temp=${tempF}, Precip=${precipInches}`);
+                }
+
+                // 4. Mapping
+                // If year is 1895, x will be 0. If year is NaN, x will be NaN.
                 let x = p.map(year, 1895, 2026, 0, w);
+
+                // Safety: If precip is unexpectedly high, map it to the top of the chart
                 let y = p.map(precipInches, 0, 10, h, 0);
 
-                // 4. Heatmap Color Logic
-                // Low temp (35F) = Blue, High temp (65F) = Red
-                let c1 = p.color(0, 120, 255, 150);
-                let c2 = p.color(255, 60, 0, 150);
+                // 5. Draw
+                if (!isNaN(x) && !isNaN(y)) {
+                    let amt = p.map(tempF, 35, 65, 0, 1);
+                    let col = p.lerpColor(p.color(0, 0, 255, 150), p.color(255, 0, 0, 150), p.constrain(amt, 0, 1));
 
-                // Constrain ensures we don't get "broken" colors outside the 35-65 range
-                let amt = p.map(tempF, 35, 65, 0, 1);
-                let col = p.lerpColor(c1, c2, p.constrain(amt, 0, 1));
-
-                p.fill(col);
-                p.noStroke();
-
-                // Draw dots that are slightly larger for visibility
-                p.rect(x, y, 4, 4);
+                    p.fill(col);
+                    p.noStroke();
+                    // Use a small circle or rect
+                    p.ellipse(x, y, 4, 4);
+                }
             }
 
             // 5. Draw Labels
