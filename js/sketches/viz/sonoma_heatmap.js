@@ -41,7 +41,8 @@
                 let x = p.map(year, 1895, 2026, 0, w);
 
                 // Safety: If precip is unexpectedly high, map it to the top of the chart
-                let y = p.map(precipInches, 0, 10, h, 0);
+                let y = p.map(precipInches, 0, 60, h, 0);
+                y = p.constrain(y, 0, h);
 
                 // 5. Draw
                 if (!isNaN(x) && !isNaN(y)) {
@@ -50,7 +51,6 @@
 
                     p.fill(col);
                     p.noStroke();
-                    // Use a small circle or rect
                     p.ellipse(x, y, 4, 4);
                 }
             }
@@ -64,8 +64,6 @@
             p.push();
             p.rotate(-p.HALF_PI);
             p.text("Precipitation (Inches)", -h / 2, -40);
-            p.pop();
-
             p.pop();
         }
     };
