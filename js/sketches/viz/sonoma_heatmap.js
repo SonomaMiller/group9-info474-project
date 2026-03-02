@@ -41,7 +41,7 @@
                 let x = p.map(year, 1895, 2026, 0, w);
 
                 // Safety: If precip is unexpectedly high, map it to the top of the chart
-                let y = p.map(precipInches, 0, 60, h, 0);
+                let y = p.map(precipInches, 30, 60, h, 0);
                 y = p.constrain(y, 0, h);
 
                 // 5. Draw
