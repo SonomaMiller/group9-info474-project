@@ -32,10 +32,6 @@
                 // Use i to match the row in precipTable
                 let precipInches = precipTable.getNum(i, 1);
 
-                if (i === 0) {
-                    console.log(`Row 0 debug: Date=${dateStr}, Year=${year}, Temp=${tempF}, Precip=${precipInches}`);
-                }
-
                 // 4. Mapping
                 // If year is 1895, x will be 0. If year is NaN, x will be NaN.
                 let x = p.map(year, 1895, 2026, 0, w);
@@ -45,12 +41,29 @@
 
                 // 5. Draw
                 if (!isNaN(x) && !isNaN(y)) {
+                    let cBlue = p.color(0, 0, 255, 180);   // Cold
+                    let cWhite = p.color(255, 255, 255, 180); // Neutral
+                    let cRed = p.color(255, 0, 0, 180);    // Hot
+
                     let amt = p.map(tempF, 35, 65, 0, 1);
-                    let col = p.lerpColor(p.color(0, 0, 255, 150), p.color(255, 0, 0, 150), p.constrain(amt, 0, 1));
+                    amt = p.constrain(amt, 0, 1);
+
+                    let col;
+                    if (amt < 0.5) {
+                        // First half: Blue to White
+                        let inter = p.map(amt, 0, 0.5, 0, 1);
+                        col = p.lerpColor(cBlue, cWhite, inter);
+                    } else {
+                        // Second half: White to Red
+                        let inter = p.map(amt, 0.5, 1, 0, 1);
+                        col = p.lerpColor(cWhite, cRed, inter);
+                    }
 
                     p.fill(col);
                     p.noStroke();
-                    p.ellipse(x, y, 4, 4);
+                    p.stroke(0, 50);
+                    p.strokeWeight(0.5);
+                    p.ellipse(x, y, 5, 5);
                 }
             }
 
