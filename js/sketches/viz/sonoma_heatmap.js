@@ -42,7 +42,6 @@
 
                 // Safety: If precip is unexpectedly high, map it to the top of the chart
                 let y = p.map(precipInches, 30, 60, h, 0);
-                y = p.constrain(y, 0, h);
 
                 // 5. Draw
                 if (!isNaN(x) && !isNaN(y)) {
