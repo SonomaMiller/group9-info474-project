@@ -6,7 +6,7 @@
             console.log(manager.width, manager.height);
 
             const margin = 60;
-            const w = manager.width - margin * 2 + 50;
+            const w = manager.width - margin * 2 + 90;
             const h = manager.height - margin * 2;
 
             const numberOfRows = table.getRowCount();
@@ -79,6 +79,7 @@
             // draw x- and y-labels
             p.push();
 
+            p.textSize(13);
             p.translate(margin - 45, margin + h / 2);
             p.rotate(-p.HALF_PI);
             p.textAlign(p.CENTER, p.CENTER);
@@ -86,6 +87,7 @@
 
             p.pop();
 
+            p.textSize(13);
             p.textAlign(p.CENTER, p.BOTTOM);
             p.text("Year", margin + w / 2, margin + h + 35);
 
