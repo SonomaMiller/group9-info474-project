@@ -8,6 +8,7 @@
             manager.avgTempTable = manager.p5.loadTable('data/washington_avg_temp_clean.csv', 'csv', 'header');
             manager.tempTable = manager.p5.loadTable('data/temperature_clean.csv', 'csv', 'header');
             manager.precipTable = manager.p5.loadTable('data/precipitation_clean.csv', 'csv', 'header');
+            manager.precipV2Table = manager.p5.loadTable('data/washington_precipitation_v2.csv', 'header');
 
             manager.offsetX = (manager.margin && manager.margin.left) || 20;
             manager.offsetY = (manager.margin && manager.margin.top) || 0;
@@ -34,7 +35,11 @@
                 return;
             }
 
-            if (ai >= 5 && ai < 7) {
+            if (ai === 5) {
+                window.Amber_Precipitation.draw(p, manager, ai, progress);
+            }
+
+            if (ai === 6) {
                 window.VizScatter.draw(p, manager, ai, progress);
                 return;
             }
