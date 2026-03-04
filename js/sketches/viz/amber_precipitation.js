@@ -33,7 +33,7 @@
             p.strokeWeight(0.7);
             p.textSize(16);
             p.textAlign(p.CENTER, p.CENTER);
-            p.text("Washington Dry Season Precipitation (Jul–Aug) 1895–2026", manager.width / 2, 30);
+            p.text("Washington Dry Season Precipitation (Jul-Aug) 1895-2026", manager.width / 2, 30);
 
             // draw axes
             p.line(margin, margin, margin, margin + h);
