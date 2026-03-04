@@ -5,7 +5,7 @@
             let table = manager.precipV2Table;
 
             const margin = 70;
-            const w = manager.width - margin * 2;
+            const w = manager.width - margin * 2 + 90;
             const h = manager.height - margin * 2;
 
             let yearly = {};
@@ -58,7 +58,7 @@
                 p.text(value.toFixed(1), margin - 8, y);
             }
 
-            // bars
+            // draw bars
             const barW = w / numberOfRows;
             for (let i = 0; i < numberOfRows; i++) {
                 let x = margin + (i / (numberOfRows - 1)) * w - barW / 2;
@@ -69,6 +69,34 @@
                 p.noStroke();
                 p.rect(x, yVal, barW - 0.5, yBase - yVal);
             }
+
+            // draw x-axis labels
+            p.push();
+            p.fill(0);
+            p.noStroke();
+            p.textSize(10);
+            p.textAlign(p.CENTER, p.TOP);
+            for (let i = 0; i < numberOfRows; i += 10) {
+                let x = margin + (i / (numberOfRows - 1)) * w;
+                p.text(years[i], x, margin + h + 5);
+            }
+
+            // draw x- and y-axis title
+            p.push();
+
+            p.fill(0);
+            p.noStroke();
+            p.translate(margin - 50, margin + h / 2);
+            p.rotate(-p.HALF_PI);
+            p.textSize(13);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text("Precipitation (in.)", 0, 0);
+
+            p.pop();
+
+            p.textSize(13);
+            p.textAlign(p.CENTER, p.BOTTOM);
+            p.text("Year", manager.width / 2, manager.height - 30);
 
         }
     };
