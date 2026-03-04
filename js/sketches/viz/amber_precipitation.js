@@ -2,7 +2,7 @@
     window.Amber_Precipitation = {
         draw: function (p, manager, ai, progress) {
 
-            let table = manager.precipV2Table;
+            let table = manager.precipDrynessTable;
 
             const margin = 70;
             const w = manager.width - margin * 2 + 90;
