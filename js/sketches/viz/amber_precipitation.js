@@ -58,6 +58,18 @@
                 p.text(value.toFixed(1), margin - 8, y);
             }
 
+            // bars
+            const barW = w / numberOfRows;
+            for (let i = 0; i < numberOfRows; i++) {
+                let x = margin + (i / (numberOfRows - 1)) * w - barW / 2;
+                let yVal = margin + h - ((dry[i] - minVal) / (maxVal - minVal)) * h;
+                let yBase = margin + h;
+
+                p.fill(200, 120, 80, 200);
+                p.noStroke();
+                p.rect(x, yVal, barW - 0.5, yBase - yVal);
+            }
+
         }
     };
 })();
