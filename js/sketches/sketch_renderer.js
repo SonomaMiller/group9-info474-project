@@ -8,6 +8,7 @@
             manager.avgTempTable = manager.p5.loadTable('data/washington_avg_temp_clean.csv', 'csv', 'header');
             manager.tempTable = manager.p5.loadTable('data/temperature_clean.csv', 'csv', 'header');
             manager.precipTable = manager.p5.loadTable('data/precipitation_clean.csv', 'csv', 'header');
+            manager.snowPackTable = manager.p5.loadTable('data/WA-SnowfallData.csv', 'csv', 'header');
 
             manager.offsetX = (manager.margin && manager.margin.left) || 20;
             manager.offsetY = (manager.margin && manager.margin.top) || 0;
