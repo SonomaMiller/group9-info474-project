@@ -96,7 +96,7 @@
 
             p.textSize(13);
             p.textAlign(p.CENTER, p.BOTTOM);
-            p.text("Year", manager.width / 2, manager.height - 30);
+            p.text("Year", margin + w / 2, margin + h + 35);
 
         }
     };
