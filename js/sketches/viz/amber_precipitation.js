@@ -39,6 +39,25 @@
             p.line(margin, margin, margin, margin + h);
             p.line(margin, margin + h, margin + w, margin + h);
 
+             // draw y-ticks and scale
+            const numYTicks = 14;
+            const range = maxVal - minVal;
+            for (let i = 0; i <= numYTicks; i++) {
+                let t = i / numYTicks;
+                let value = minVal + t * range;
+                let y = margin + h - t * h;
+
+                p.stroke(0);
+                p.strokeWeight(0.1);
+                p.line(margin - 5, y, margin + w, y);
+
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.textAlign(p.RIGHT, p.CENTER);
+                p.text(value.toFixed(1), margin - 8, y);
+            }
+
         }
     };
 })();
