@@ -12,48 +12,93 @@
             const h = manager.height;
             const rowCount = tempTable.getRowCount();
 
-            // --- Rotation Logic ---
-            // p.frameCount makes it animate over time
+            // --- Configuration ---
             let rotAngle = p.frameCount * 0.01;
-            let viewScale = 0.6;
+            let viewScale = 0.7;
+            const boxSize = 300;
+            const halfBox = boxSize / 2;
 
-            // Helper function for 3D rotation and projection in 2D space
+            // Manual 3D to 2D Projection
             const project = (x3d, y3d, z3d) => {
-                // 1. Center the data (assuming a 300x300x300 cube)
-                let cx = x3d - 150;
-                let cy = y3d - 150;
-                let cz = z3d - 150;
+                let cx = x3d - halfBox;
+                let cy = y3d - halfBox;
+                let cz = z3d - halfBox;
 
-                // 2. Rotate around the Y-axis (Standard Rotation Matrix)
                 let rotX = cx * p.cos(rotAngle) - cz * p.sin(rotAngle);
                 let rotZ = cx * p.sin(rotAngle) + cz * p.cos(rotAngle);
 
-                // 3. Project to 2D Screen Coordinates
                 let screenX = (w / 2) + (rotX * viewScale);
                 let screenY = (h / 2) + (cy * viewScale);
 
-                return { x: screenX, y: screenY };
+                return { x: screenX, y: screenY, z: rotZ };
             };
 
-            // --- Draw Axes ---
-            p.stroke(200);
+            // --- 1. Draw Bounding Box & Ticks ---
+            p.stroke(220);
             p.strokeWeight(1);
-            let origin = project(0, 0, 0);
-            let xAxis = project(300, 0, 0);
-            let yAxis = project(0, 300, 0);
-            let zAxis = project(0, 0, 300);
 
-            p.line(origin.x, origin.y, xAxis.x, xAxis.y); // Year
-            p.line(origin.x, origin.y, yAxis.x, yAxis.y); // Precip
-            p.line(origin.x, origin.y, zAxis.x, zAxis.y); // Temp
+            // Draw 4 ticks per axis
+            for (let t = 0; t <= 1; t += 0.25) {
+                let val = t * boxSize;
 
-            p.fill(100);
+                // Year Ticks (X-axis)
+                let tx1 = project(val, boxSize, 0);
+                let tx2 = project(val, boxSize + 10, 0);
+                p.line(tx1.x, tx1.y, tx2.x, tx2.y);
+
+                // Precip Ticks (Y-axis)
+                let ty1 = project(0, val, 0);
+                let ty2 = project(-10, val, 0);
+                p.line(ty1.x, ty1.y, ty2.x, ty2.y);
+
+                // Temp Ticks (Z-axis)
+                let tz1 = project(0, boxSize, val);
+                let tz2 = project(0, boxSize + 10, val);
+                p.line(tz1.x, tz1.y, tz2.x, tz2.y);
+            }
+
+            // --- 2. Axis Labels (Min/Max) ---
+            p.fill(120);
             p.noStroke();
-            p.text("Year", xAxis.x, xAxis.y);
-            p.text("Precipitation", yAxis.x, yAxis.y);
-            p.text("Temperature", zAxis.x, zAxis.y);
+            p.textSize(10);
+            p.textAlign(p.CENTER);
 
-            // --- Draw the 3D Line ---
+            // Year Labels
+            let yStart = project(0, boxSize + 20, 0);
+            let yEnd = project(boxSize, boxSize + 20, 0);
+            p.text("1895", yStart.x, yStart.y);
+            p.text("2026", yEnd.x, yEnd.y);
+
+            // Precip Labels
+            let pStart = project(-25, boxSize, 0);
+            let pEnd = project(-25, 0, 0);
+            p.text("0\"", pStart.x, pStart.y);
+            p.text("80\"", pEnd.x, pEnd.y);
+
+            // Temp Labels
+            let tStart = project(0, boxSize + 20, 0);
+            let tEnd = project(0, boxSize + 20, boxSize);
+            // Offset to avoid overlap with Year
+            p.text("35°F", tStart.x - 20, tStart.y + 10);
+            p.text("75°F", tEnd.x, tEnd.y + 10);
+
+            // --- 3. Main Axis Titles ---
+            p.textSize(14);
+            p.fill(0);
+            let titleYear = project(halfBox, boxSize + 45, 0);
+            p.text("YEAR", titleYear.x, titleYear.y);
+
+            let titleTemp = project(0, boxSize + 45, halfBox);
+            p.text("TEMP", titleTemp.x, titleTemp.y);
+
+            p.push();
+            let titlePrecip = project(-50, halfBox, 0);
+            p.translate(titlePrecip.x, titlePrecip.y);
+            p.rotate(-p.HALF_PI);
+            p.text("PRECIPITATION", 0, 0);
+            p.pop();
+
+            // --- 4. The 3D Line ---
             p.noFill();
             p.strokeWeight(2);
             p.beginShape();
@@ -66,18 +111,15 @@
                 let tempF = tempTable.getNum(i, 1);
                 let precipInches = precipTable.getNum(i, 1);
 
-                // Map raw data to the 300-unit virtual cube
-                let x3 = p.map(year, 1895, 2026, 0, 300);
-                let y3 = p.map(precipInches, 0, 80, 300, 0);
-                let z3 = p.map(tempF, 35, 75, 0, 300);
+                let x3 = p.map(year, 1895, 2026, 0, boxSize);
+                let y3 = p.map(precipInches, 0, 80, boxSize, 0);
+                let z3 = p.map(tempF, 35, 75, 0, boxSize);
 
                 let pos = project(x3, y3, z3);
 
                 if (!isNaN(pos.x) && !isNaN(pos.y)) {
-                    // Change color based on Temperature (Z-axis)
                     let colAmt = p.map(tempF, 45, 65, 0, 1);
                     let c = p.lerpColor(p.color(0, 100, 255), p.color(255, 50, 0), p.constrain(colAmt, 0, 1));
-
                     p.stroke(c);
                     p.vertex(pos.x, pos.y);
                 }

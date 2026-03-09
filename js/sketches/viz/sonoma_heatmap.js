@@ -17,7 +17,7 @@
             let temps = tempTable.getColumn(1).map(Number);
             let minDataTemp = Math.min(...temps);
             let maxDataTemp = Math.max(...temps);
-            
+
             let precips = precipTable.getColumn(1).map(Number);
             let maxPrecip = Math.max(...precips);
 
@@ -47,7 +47,7 @@
                 amt = p.constrain(amt, 0, 1);
 
                 let cBlue = p.color(0, 50, 255);
-                let cWhite = p.color(245, 245, 245); 
+                let cWhite = p.color(245, 245, 245);
                 let cRed = p.color(255, 20, 0);
 
                 let col;
