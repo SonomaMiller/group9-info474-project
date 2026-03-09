@@ -36,8 +36,10 @@
             // --- 1. Draw Bounding Box & Ticks ---
             p.stroke(220);
             p.strokeWeight(1);
+
             for (let t = 0; t <= 1; t += 0.25) {
                 let val = t * boxSize;
+
                 let tx1 = project(val, boxSize, 0);
                 let tx2 = project(val, boxSize + 10, 0);
                 p.line(tx1.x, tx1.y, tx2.x, tx2.y);
@@ -51,19 +53,45 @@
                 p.line(tz1.x, tz1.y, tz2.x, tz2.y);
             }
 
-            // --- 2. Axis Labels ---
+            // --- 2. Axis Labels (Min/Max) ---
             p.fill(120);
             p.noStroke();
             p.textSize(10);
+            p.textAlign(p.CENTER);
+
             let yStart = project(0, boxSize + 20, 0);
             let yEnd = project(boxSize, boxSize + 20, 0);
             p.text("1895", yStart.x, yStart.y);
             p.text("2026", yEnd.x, yEnd.y);
 
-            let tEnd = project(0, boxSize + 20, boxSize);
-            p.text("50.1°F", tEnd.x, tEnd.y + 10);
+            let pStart = project(-25, boxSize, 0);
+            let pEnd = project(-25, 0, 0);
+            p.text("0\"", pStart.x, pStart.y);
+            p.text("80\"", pEnd.x, pEnd.y);
 
-            // --- 3. The 3D Line (Fixed Segment Logic) ---
+            let tStart = project(0, boxSize + 20, 0);
+            let tEnd = project(0, boxSize + 20, boxSize);
+            p.text("35°F", tStart.x - 20, tStart.y + 10);
+            p.text("50.1°F", tEnd.x, tEnd.y + 10); // Updated z-axis label
+
+            // --- 3. Main Axis Titles ---
+            p.textSize(14);
+            p.fill(0);
+            let titleYear = project(halfBox, boxSize + 45, 0);
+            p.text("YEAR", titleYear.x, titleYear.y);
+
+            let titleTemp = project(0, boxSize + 45, halfBox);
+            p.text("TEMP", titleTemp.x, titleTemp.y);
+
+            p.push();
+            let titlePrecip = project(-50, halfBox, 0);
+            p.translate(titlePrecip.x, titlePrecip.y);
+            p.rotate(-p.HALF_PI);
+            p.text("PRECIPITATION", 0, 0);
+            p.pop();
+
+            // --- 4. The 3D Line ---
+            p.strokeWeight(2);
             let lastPos = null;
 
             for (let i = 0; i < rowCount; i++) {
@@ -76,21 +104,19 @@
 
                 let x3 = p.map(year, 1895, 2026, 0, boxSize);
                 let y3 = p.map(precipInches, 0, 80, boxSize, 0);
-                // Updated Mapping to include your 50.1 max
-                let z3 = p.map(tempF, 35, 50.1, 0, boxSize);
+                let z3 = p.map(tempF, 35, 50.1, 0, boxSize); // Updated z-axis mapping
 
-                let currentPos = project(x3, y3, z3);
+                let pos = project(x3, y3, z3);
 
-                if (lastPos && !isNaN(currentPos.x) && !isNaN(currentPos.y)) {
-                    // Color based on Temperature
+                if (lastPos && !isNaN(pos.x) && !isNaN(pos.y)) {
+                    // Fixed Color: Segment-based stroke for gradient effect
                     let colAmt = p.map(tempF, 35, 50.1, 0, 1);
                     let c = p.lerpColor(p.color(0, 100, 255), p.color(255, 50, 0), p.constrain(colAmt, 0, 1));
 
                     p.stroke(c);
-                    p.strokeWeight(2);
-                    p.line(lastPos.x, lastPos.y, currentPos.x, currentPos.y);
+                    p.line(lastPos.x, lastPos.y, pos.x, pos.y);
                 }
-                lastPos = currentPos;
+                lastPos = pos;
             }
         }
     };
