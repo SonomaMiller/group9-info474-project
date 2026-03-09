@@ -78,9 +78,8 @@
             // Temp Labels
             let tStart = project(0, boxSize + 20, 0);
             let tEnd = project(0, boxSize + 20, boxSize);
-            // Offset to avoid overlap with Year
             p.text("35°F", tStart.x - 20, tStart.y + 10);
-            p.text("75°F", tEnd.x, tEnd.y + 10);
+            p.text("50°F", tEnd.x, tEnd.y + 10);
 
             // --- 3. Main Axis Titles ---
             p.textSize(14);
