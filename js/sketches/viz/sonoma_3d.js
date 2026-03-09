@@ -7,26 +7,18 @@
             if (!tempTable || !precipTable) return;
 
             p.background(255);
-
-            const margin = 80;
-            const w = manager.width - margin * 2;
-            const h = manager.height - margin * 2;
-            const rowCount = tempTable.getRowCount();
-
-            // Angle to tilt the Z-axis (Temperature)
-            const angle = p.PI / 6;
-            const zScale = 0.5; // How "deep" the Z-axis looks
-
-            // Helper function to turn 3D (x,y,z) into 2D (screenX, screenY)
-            const project = (x3d, y3d, z3d) => {
-                // We offset based on the Z-axis angle to create the 3D illusion
-                let screenX = x3d + z3d * p.cos(angle) * zScale;
-                let screenY = y3d - z3d * p.sin(angle) * zScale;
-                return { x: screenX, y: screenY };
-            };
-
             p.push();
-            p.translate(margin, h + margin); // Start from bottom-left
+            p.rotateY(p.frameCount * 0.01);
+            p.rotateX(-0.2); // Slight tilt to see the floor
+
+            const rowCount = tempTable.getRowCount();
+            const size = 300; // The bounding box size for our graph
+
+            // Draw Axes for reference
+            p.stroke(200);
+            p.line(-size / 2, size / 2, -size / 2, size / 2, size / 2, -size / 2); // X
+            p.line(-size / 2, size / 2, -size / 2, -size / 2, -size / 2, -size / 2); // Y
+            p.line(-size / 2, size / 2, -size / 2, -size / 2, size / 2, size / 2); // Z
 
             p.noFill();
             p.strokeWeight(2);
@@ -36,50 +28,38 @@
                 let dateStr = tempTable.getString(i, 0);
                 if (!dateStr) continue;
 
-                let year = parseInt(dateStr.split('-')[1]);
+                let dateParts = dateStr.split('-');
+                let year = parseInt(dateParts[1]);
                 let tempF = tempTable.getNum(i, 1);
                 let precipInches = precipTable.getNum(i, 1);
 
                 // Map raw data to 3D coordinate space
-                let x3 = p.map(year, 1895, 2026, 0, w * 0.8);
-                let y3 = p.map(precipInches, 0, 80, 0, -h * 0.8); // Negative is UP
-                let z3 = p.map(tempF, 35, 75, 0, w * 0.5);
+                // X: Year (Mapped from left to right)
+                let x = p.map(year, 1895, 2026, -size / 2, size / 2);
 
-                // Project to 2D
-                let pos = project(x3, y3, z3);
+                // Y: Precipitation (Mapped bottom to top)
+                let y = p.map(precipInches, 0, 80, size / 2, -size / 2);
 
-                if (!isNaN(pos.x) && !isNaN(pos.y)) {
-                    // Color based on Temperature (Z-axis)
-                    let colAmt = p.map(tempF, 45, 65, 0, 1);
-                    let c = p.lerpColor(p.color(0, 150, 255), p.color(255, 50, 0), p.constrain(colAmt, 0, 1));
+                // Z: Temperature (Mapped front to back)
+                let z = p.map(tempF, 35, 75, -size / 2, size / 2);
 
+                if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+                    // Change color dynamically based on temperature
+                    let colAmt = p.map(tempF, 40, 70, 0, 1);
+                    let c = p.lerpColor(p.color(0, 100, 255), p.color(255, 50, 0), p.constrain(colAmt, 0, 1));
                     p.stroke(c);
-                    p.vertex(pos.x, pos.y);
+
+                    p.vertex(x, y, z);
                 }
             }
             p.endShape();
-
-            p.stroke(200);
-            p.strokeWeight(1);
-            // X Axis (Year)
-            let xEnd = project(w * 0.8, 0, 0);
-            p.line(0, 0, xEnd.x, xEnd.y);
-            // Y Axis (Precip)
-            let yEnd = project(0, -h * 0.8, 0);
-            p.line(0, 0, yEnd.x, yEnd.y);
-            // Z Axis (Temp)
-            let zEnd = project(0, 0, w * 0.5);
-            p.line(0, 0, zEnd.x, zEnd.y);
-
             p.pop();
 
-            // Labels
             p.fill(0);
             p.noStroke();
-            p.textSize(12);
-            p.text("Precipitation", 20, 50);
-            p.text("Year", margin + w * 0.7, h + margin + 20);
-            p.text("Temperature", margin + 120, h + margin - 20);
+            p.textSize(16);
+            p.textAlign(p.LEFT, p.TOP);
+            p.text("3D Climate Path: X=Year, Y=Precip, Z=Temp", -p.width / 2 + 20, -p.height / 2 + 20);
         }
     };
 })();
