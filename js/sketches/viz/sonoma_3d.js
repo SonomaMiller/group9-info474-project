@@ -36,71 +36,35 @@
             // --- 1. Draw Bounding Box & Ticks ---
             p.stroke(220);
             p.strokeWeight(1);
-
-            // Draw 4 ticks per axis
             for (let t = 0; t <= 1; t += 0.25) {
                 let val = t * boxSize;
-
-                // Year Ticks (X-axis)
                 let tx1 = project(val, boxSize, 0);
                 let tx2 = project(val, boxSize + 10, 0);
                 p.line(tx1.x, tx1.y, tx2.x, tx2.y);
 
-                // Precip Ticks (Y-axis)
                 let ty1 = project(0, val, 0);
                 let ty2 = project(-10, val, 0);
                 p.line(ty1.x, ty1.y, ty2.x, ty2.y);
 
-                // Temp Ticks (Z-axis)
                 let tz1 = project(0, boxSize, val);
                 let tz2 = project(0, boxSize + 10, val);
                 p.line(tz1.x, tz1.y, tz2.x, tz2.y);
             }
 
-            // --- 2. Axis Labels (Min/Max) ---
+            // --- 2. Axis Labels ---
             p.fill(120);
             p.noStroke();
             p.textSize(10);
-            p.textAlign(p.CENTER);
-
-            // Year Labels
             let yStart = project(0, boxSize + 20, 0);
             let yEnd = project(boxSize, boxSize + 20, 0);
             p.text("1895", yStart.x, yStart.y);
             p.text("2026", yEnd.x, yEnd.y);
 
-            // Precip Labels
-            let pStart = project(-25, boxSize, 0);
-            let pEnd = project(-25, 0, 0);
-            p.text("0\"", pStart.x, pStart.y);
-            p.text("80\"", pEnd.x, pEnd.y);
-
-            // Temp Labels
-            let tStart = project(0, boxSize + 20, 0);
             let tEnd = project(0, boxSize + 20, boxSize);
-            p.text("35°F", tStart.x - 20, tStart.y + 10);
-            p.text("50°F", tEnd.x, tEnd.y + 10);
+            p.text("50.1°F", tEnd.x, tEnd.y + 10);
 
-            // --- 3. Main Axis Titles ---
-            p.textSize(14);
-            p.fill(0);
-            let titleYear = project(halfBox, boxSize + 45, 0);
-            p.text("YEAR", titleYear.x, titleYear.y);
-
-            let titleTemp = project(0, boxSize + 45, halfBox);
-            p.text("TEMP", titleTemp.x, titleTemp.y);
-
-            p.push();
-            let titlePrecip = project(-50, halfBox, 0);
-            p.translate(titlePrecip.x, titlePrecip.y);
-            p.rotate(-p.HALF_PI);
-            p.text("PRECIPITATION", 0, 0);
-            p.pop();
-
-            // --- 4. The 3D Line ---
-            p.noFill();
-            p.strokeWeight(2);
-            p.beginShape();
+            // --- 3. The 3D Line (Fixed Segment Logic) ---
+            let lastPos = null;
 
             for (let i = 0; i < rowCount; i++) {
                 let dateStr = tempTable.getString(i, 0);
@@ -112,18 +76,22 @@
 
                 let x3 = p.map(year, 1895, 2026, 0, boxSize);
                 let y3 = p.map(precipInches, 0, 80, boxSize, 0);
-                let z3 = p.map(tempF, 35, 50, 0, boxSize);
+                // Updated Mapping to include your 50.1 max
+                let z3 = p.map(tempF, 35, 50.1, 0, boxSize);
 
-                let pos = project(x3, y3, z3);
+                let currentPos = project(x3, y3, z3);
 
-                if (!isNaN(pos.x) && !isNaN(pos.y)) {
-                    let colAmt = p.map(tempF, 35, 50, 0, 1);
+                if (lastPos && !isNaN(currentPos.x) && !isNaN(currentPos.y)) {
+                    // Color based on Temperature
+                    let colAmt = p.map(tempF, 35, 50.1, 0, 1);
                     let c = p.lerpColor(p.color(0, 100, 255), p.color(255, 50, 0), p.constrain(colAmt, 0, 1));
+
                     p.stroke(c);
-                    p.vertex(pos.x, pos.y);
+                    p.strokeWeight(2);
+                    p.line(lastPos.x, lastPos.y, currentPos.x, currentPos.y);
                 }
+                lastPos = currentPos;
             }
-            p.endShape();
         }
     };
 })();
