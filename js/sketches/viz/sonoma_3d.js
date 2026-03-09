@@ -33,42 +33,77 @@
                 return { x: screenX, y: screenY, z: rotZ };
             };
 
-            // --- 1. Grey Grids for Axes ---
-            p.stroke(235);
+            // --- 1. Full Triple-Plane Grid ---
+            p.stroke(240);
             p.strokeWeight(1);
-            for (let i = 0; i <= 1; i += 0.1) {
+            for (let i = 0; i <= 1; i += 0.2) {
                 let d = i * boxSize;
-                // Floor Grid (X-Z)
+
+                // Floor Grid (Year vs Temperature)
                 let f1 = project(d, boxSize, 0); let f2 = project(d, boxSize, boxSize);
                 p.line(f1.x, f1.y, f2.x, f2.y);
                 let f3 = project(0, boxSize, d); let f4 = project(boxSize, boxSize, d);
                 p.line(f3.x, f3.y, f4.x, f4.y);
 
-                // Back Wall Grid (X-Y)
+                // Back Wall Grid (Year vs Precipitation)
                 let b1 = project(d, 0, 0); let b2 = project(d, boxSize, 0);
                 p.line(b1.x, b1.y, b2.x, b2.y);
                 let b3 = project(0, d, 0); let b4 = project(boxSize, d, 0);
                 p.line(b3.x, b3.y, b4.x, b4.y);
+
+                // Side Wall Grid (Temp vs Precipitation)
+                let s1 = project(0, d, 0); let s2 = project(0, d, boxSize);
+                p.line(s1.x, s1.y, s2.x, s2.y);
+                let s3 = project(0, 0, d); let s4 = project(0, boxSize, d);
+                p.line(s3.x, s3.y, s4.x, s4.y);
             }
 
-            // --- 2. Bounding Box & Ticks ---
-            p.stroke(200);
-            for (let t = 0; t <= 1; t += 0.25) {
-                let val = t * boxSize;
-                let tx1 = project(val, boxSize, 0); let tx2 = project(val, boxSize + 10, 0);
+            // --- 2. Axis Ticks & Bounding Box ---
+            p.stroke(180);
+            for (let t = 0; t <= 1; t += 0.5) {
+                let v = t * boxSize;
+                // Year Ticks
+                let tx1 = project(v, boxSize, 0); let tx2 = project(v, boxSize + 8, 0);
                 p.line(tx1.x, tx1.y, tx2.x, tx2.y);
-                let ty1 = project(0, val, 0); let ty2 = project(-10, val, 0);
+                // Precip Ticks
+                let ty1 = project(0, v, 0); let ty2 = project(-8, v, 0);
                 p.line(ty1.x, ty1.y, ty2.x, ty2.y);
-                let tz1 = project(0, boxSize, val); let tz2 = project(0, boxSize + 10, val);
+                // Temp Ticks
+                let tz1 = project(0, boxSize, v); let tz2 = project(0, boxSize + 8, v);
                 p.line(tz1.x, tz1.y, tz2.x, tz2.y);
             }
 
-            // --- 3. Axis Labels ---
-            p.fill(120); p.noStroke(); p.textSize(10); p.textAlign(p.CENTER);
-            let yStart = project(0, boxSize + 20, 0); let yEnd = project(boxSize, boxSize + 20, 0);
-            p.text("1895", yStart.x, yStart.y); p.text("2026", yEnd.x, yEnd.y);
-            let tStart = project(0, boxSize + 20, 0); let tEnd = project(0, boxSize + 20, boxSize);
-            p.text("35\u2109", tStart.x - 20, tStart.y + 10); p.text("50.1\u2109", tEnd.x, tEnd.y + 10);
+            // --- 3. Bold Titles & Labels ---
+            p.noStroke();
+            p.textAlign(p.CENTER);
+
+            // Sub-labels (Min/Mid/Max)
+            p.fill(150); p.textSize(9);
+            // Year
+            let yL1 = project(0, boxSize+15, 0); let yL2 = project(boxSize, boxSize+15, 0);
+            p.text("1895", yL1.x, yL1.y); p.text("2026", yL2.x, yL2.y);
+            // Precip
+            let pL1 = project(-20, boxSize, 0); let pL2 = project(-20, 0, 0);
+            p.text("0\"", pL1.x, pL1.y); p.text("80\"", pL2.x, pL2.y);
+            // Temp
+            let tL1 = project(0, boxSize+15, 0); let tL2 = project(0, boxSize+15, boxSize);
+            p.text("35\u00B0F", tL1.x-15, tL1.y+5); p.text("50.1\u00B0F", tL2.x, tL2.y+5);
+
+            // Bold Main Titles
+            p.fill(0); p.textStyle(p.BOLD); p.textSize(13);
+            let tYear = project(halfBox, boxSize + 40, 0);
+            p.text("YEAR", tYear.x, tYear.y);
+
+            let tTemp = project(0, boxSize + 40, halfBox);
+            p.text("TEMPERATURE", tTemp.x, tTemp.y);
+
+            p.push();
+            let tPrecip = project(-45, halfBox, 0);
+            p.translate(tPrecip.x, tPrecip.y);
+            p.rotate(-p.HALF_PI);
+            p.text("PRECIPITATION", 0, 0);
+            p.pop();
+            p.textStyle(p.NORMAL); // Reset style
 
             // --- 4. The 3D Ribbon (Plane) ---
             let lastPos = null;
@@ -77,7 +112,6 @@
             for (let i = 0; i < rowCount; i++) {
                 let dateStr = tempTable.getString(i, 0);
                 if (!dateStr) continue;
-
                 let year = parseInt(dateStr.split('-')[1]);
                 let tempF = tempTable.getNum(i, 1);
                 let precipInches = precipTable.getNum(i, 1);
@@ -86,34 +120,27 @@
                 let y3 = p.map(precipInches, 0, 80, boxSize, 0);
                 let z3 = p.map(tempF, 35, 50.1, 0, boxSize);
 
-                let currentPos = project(x3, y3, z3);
-                let currentFloor = project(x3, boxSize, z3); // Point directly on the floor
+                let curPos = project(x3, y3, z3);
+                let curFloor = project(x3, boxSize, z3);
 
-                if (lastPos && !isNaN(currentPos.x)) {
+                if (lastPos && !isNaN(curPos.x)) {
                     let colAmt = p.map(tempF, 35, 50.1, 0, 1);
-                    let c = p.lerpColor(p.color(0, 100, 255, 150), p.color(255, 50, 0, 150), p.constrain(colAmt, 0, 1));
+                    let c = p.lerpColor(p.color(0, 120, 255, 140), p.color(255, 50, 0, 140), p.constrain(colAmt, 0, 1));
 
-                    // Draw Plane Segment (Quad)
-                    p.fill(c);
-                    p.noStroke();
+                    p.fill(c); p.noStroke();
                     p.beginShape();
-                    p.vertex(lastPos.x, lastPos.y);
-                    p.vertex(currentPos.x, currentPos.y);
-                    p.vertex(currentFloor.x, currentFloor.y);
-                    p.vertex(lastFloor.x, lastFloor.y);
+                    p.vertex(lastPos.x, lastPos.y); p.vertex(curPos.x, curPos.y);
+                    p.vertex(curFloor.x, curFloor.y); p.vertex(lastFloor.x, lastFloor.y);
                     p.endShape(p.CLOSE);
 
-                    // Optional: Draw the top line thicker to define the edge
-                    p.stroke(c);
-                    p.strokeWeight(1);
-                    p.line(lastPos.x, lastPos.y, currentPos.x, currentPos.y);
+                    p.stroke(c); p.strokeWeight(1.5);
+                    p.line(lastPos.x, lastPos.y, curPos.x, curPos.y);
                 }
-                lastPos = currentPos;
-                lastFloor = currentFloor;
+                lastPos = curPos; lastFloor = curFloor;
             }
 
             if (p.keyIsDown(32)) {
-                p.fill(0, 150); p.noStroke(); p.text("PAUSED", w - 50, 30);
+                p.fill(255, 0, 0); p.textSize(16); p.text("PAUSED", w/2, 40);
             }
         }
     };
