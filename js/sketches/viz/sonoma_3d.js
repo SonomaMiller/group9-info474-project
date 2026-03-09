@@ -112,12 +112,12 @@
 
                 let x3 = p.map(year, 1895, 2026, 0, boxSize);
                 let y3 = p.map(precipInches, 0, 80, boxSize, 0);
-                let z3 = p.map(tempF, 35, 75, 0, boxSize);
+                let z3 = p.map(tempF, 35, 50, 0, boxSize);
 
                 let pos = project(x3, y3, z3);
 
                 if (!isNaN(pos.x) && !isNaN(pos.y)) {
-                    let colAmt = p.map(tempF, 45, 65, 0, 1);
+                    let colAmt = p.map(tempF, 35, 50, 0, 1);
                     let c = p.lerpColor(p.color(0, 100, 255), p.color(255, 50, 0), p.constrain(colAmt, 0, 1));
                     p.stroke(c);
                     p.vertex(pos.x, pos.y);
