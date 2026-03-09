@@ -12,8 +12,6 @@
             const w = manager.width - margin * 2;
             const h = manager.height - margin * 2;
 
-            // 1. DYNAMIC RANGE FINDING
-            // To highlight the 2-degree shift, we find the actual tight bounds of your data
             let temps = tempTable.getColumn(1).map(Number);
             let minDataTemp = Math.min(...temps);
             let maxDataTemp = Math.max(...temps);
@@ -23,6 +21,8 @@
 
             const rowCount = tempTable.getRowCount();
             const barWidth = w / (2026 - 1895);
+
+            let hoverData = null;
 
             p.push();
             p.translate(margin, margin);
@@ -35,44 +35,63 @@
                 let tempF = tempTable.getNum(i, 1);
                 let precipInches = precipTable.getNum(i, 1);
 
-                // 2. COORDINATE MAPPING
                 let x = p.map(year, 1895, 2026, 0, w);
-                // Y starts from the bottom (h) and goes up based on inches
-                let y = p.map(precipInches, 0, maxPrecip, 0, h);
+                let yHeight = p.map(precipInches, 0, maxPrecip, 0, h);
 
-                // 3. COLOR MAPPING (The Highlight Fix)
-                // We map to the MIN and MAX of your data, not 30-75.
-                // This ensures the coldest year is PURE BLUE and hottest is PURE RED.
+                // COLOR LOGIC (Relative to Min/Max to show warming)
                 let amt = p.map(tempF, minDataTemp, maxDataTemp, 0, 1);
                 amt = p.constrain(amt, 0, 1);
 
-                let cBlue = p.color(0, 50, 255);
-                let cWhite = p.color(245, 245, 245);
-                let cRed = p.color(255, 20, 0);
+                let col = p.lerpColor(p.color(0, 50, 255), p.color(255, 20, 0), amt);
 
-                let col;
-                if (amt < 0.5) {
-                    col = p.lerpColor(cBlue, cWhite, p.map(amt, 0, 0.5, 0, 1));
+                // HOVER DETECTION
+                // Adjust mouseX/Y by the margin since we translated the origin
+                let mX = p.mouseX - margin;
+                let mY = p.mouseY - margin;
+
+                if (mX > x && mX < x + barWidth && mY > h - yHeight && mY < h) {
+                    p.fill(p.red(col), p.green(col), p.blue(col), 255); // Solid color on hover
+                    hoverData = { year, tempF, precipInches, mX: p.mouseX, mY: p.mouseY };
                 } else {
-                    col = p.lerpColor(cWhite, cRed, p.map(amt, 0.5, 1, 0, 1));
+                    p.fill(p.red(col), p.green(col), p.blue(col), 180); // Semi-transparent
                 }
 
-                // 4. DRAW THE BAR
-                p.fill(col);
                 p.noStroke();
-                // Draw bar from bottom up: rect(x, y_start, width, height)
-                p.rect(x, h - y, barWidth, y);
+                p.rect(x, h - yHeight, barWidth, yHeight);
             }
-
-            // 5. AXIS LABELS
-            p.fill(0);
-            p.textAlign(p.CENTER);
-            p.text("Year", w / 2, h + 30);
-            p.push();
-            p.rotate(-p.HALF_PI);
-            p.text("Precipitation (Inches)", -h / 2, -40);
             p.pop();
 
+            // 2. DRAW THE HOVER BOX
+            if (hoverData) {
+                this.drawHoverBox(p, hoverData);
+            }
+        },
+
+        drawHoverBox: function (p, data) {
+            let boxW = 120;
+            let boxH = 70;
+            let x = data.mX + 10;
+            let y = data.mY - boxH - 10;
+
+            // Keep box on screen
+            if (x + boxW > p.width) x = data.mX - boxW - 10;
+
+            p.push();
+            p.fill(255, 240);
+            p.stroke(0);
+            p.strokeWeight(1);
+            p.rect(x, y, boxW, boxH, 5);
+
+            p.noStroke();
+            p.fill(0);
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(12);
+            p.textStyle(p.BOLD);
+            p.text(`Year: ${data.year}`, x + 10, y + 10);
+
+            p.textStyle(p.NORMAL);
+            p.text(`Temp: ${data.tempF.toFixed(2)}°F`, x + 10, y + 30);
+            p.text(`Precip: ${data.precipInches.toFixed(2)}"`, x + 10, y + 50);
             p.pop();
         }
     };
