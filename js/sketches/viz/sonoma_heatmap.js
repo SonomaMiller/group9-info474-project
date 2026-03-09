@@ -2,20 +2,27 @@
     window.sonoma_heatmap = {
         draw: function (p, manager, ai, progress) {
             let tempTable = manager.tempTable;
+            let precipTable = manager.precipTable;
+
             if (!tempTable || tempTable.getRowCount() === 0) return;
 
             p.background(255);
 
-            const margin = 80;
+            const margin = 60;
             const w = manager.width - margin * 2;
             const h = manager.height - margin * 2;
 
-            const rowCount = tempTable.getRowCount();
+            // 1. DYNAMIC RANGE FINDING
+            // To highlight the 2-degree shift, we find the actual tight bounds of your data
+            let temps = tempTable.getColumn(1).map(Number);
+            let minDataTemp = Math.min(...temps);
+            let maxDataTemp = Math.max(...temps);
+            
+            let precips = precipTable.getColumn(1).map(Number);
+            let maxPrecip = Math.max(...precips);
 
-            // Calculate grid dimensions
-            const numYears = 2026 - 1895 + 1;
-            const cellW = w / numYears;
-            const cellH = h / 12;
+            const rowCount = tempTable.getRowCount();
+            const barWidth = w / (2026 - 1895);
 
             p.push();
             p.translate(margin, margin);
@@ -24,21 +31,23 @@
                 let dateStr = tempTable.getString(i, 0);
                 if (!dateStr) continue;
 
-                let dateParts = dateStr.split('-');
-                let month = parseInt(dateParts[0]);
-                let year = parseInt(dateParts[1]);
+                let year = parseInt(dateStr.split('-')[1]);
                 let tempF = tempTable.getNum(i, 1);
+                let precipInches = precipTable.getNum(i, 1);
 
-                // X position based on Year
+                // 2. COORDINATE MAPPING
                 let x = p.map(year, 1895, 2026, 0, w);
-                // Y position based on Month (1 at top, 12 at bottom)
-                let y = p.map(month, 1, 12, 0, h - cellH);
+                // Y starts from the bottom (h) and goes up based on inches
+                let y = p.map(precipInches, 0, maxPrecip, 0, h);
 
-                let amt = p.map(tempF, 30, 75, 0, 1);
+                // 3. COLOR MAPPING (The Highlight Fix)
+                // We map to the MIN and MAX of your data, not 30-75.
+                // This ensures the coldest year is PURE BLUE and hottest is PURE RED.
+                let amt = p.map(tempF, minDataTemp, maxDataTemp, 0, 1);
                 amt = p.constrain(amt, 0, 1);
 
                 let cBlue = p.color(0, 50, 255);
-                let cWhite = p.color(240, 240, 240);
+                let cWhite = p.color(245, 245, 245); 
                 let cRed = p.color(255, 20, 0);
 
                 let col;
@@ -48,22 +57,21 @@
                     col = p.lerpColor(cWhite, cRed, p.map(amt, 0.5, 1, 0, 1));
                 }
 
-                // 3. Draw the "Cell"
+                // 4. DRAW THE BAR
                 p.fill(col);
                 p.noStroke();
-                p.rect(x, y, cellW + 0.5, cellH + 0.5);
+                // Draw bar from bottom up: rect(x, y_start, width, height)
+                p.rect(x, h - y, barWidth, y);
             }
 
-            // 4. Labels
+            // 5. AXIS LABELS
             p.fill(0);
-            p.textAlign(p.CENTER, p.TOP);
-            p.text("1895", 0, h + 10);
-            p.text("2026", w, h + 10);
-            p.text("Year", w/2, h + 25);
-
-            p.textAlign(p.RIGHT, p.CENTER);
-            p.text("Jan", -10, cellH/2);
-            p.text("Dec", -10, h - cellH/2);
+            p.textAlign(p.CENTER);
+            p.text("Year", w / 2, h + 30);
+            p.push();
+            p.rotate(-p.HALF_PI);
+            p.text("Precipitation (Inches)", -h / 2, -40);
+            p.pop();
 
             p.pop();
         }
