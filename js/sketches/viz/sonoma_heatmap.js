@@ -61,6 +61,18 @@
             }
             p.pop();
 
+            // DRAW AXIS LABELS
+            p.fill(0);
+            p.textAlign(p.CENTER);
+            p.textSize(12);
+            p.text("Year (1895 - 2026)", margin + w / 2, margin + h + 35);
+
+            p.push();
+            p.translate(margin - 40, margin + h / 2);
+            p.rotate(-p.HALF_PI);
+            p.text("Precipitation (Inches)", 0, 0);
+            p.pop();
+
             // 2. DRAW THE HOVER BOX
             if (hoverData) {
                 this.drawHoverBox(p, hoverData);
