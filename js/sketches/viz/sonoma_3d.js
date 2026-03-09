@@ -7,19 +7,53 @@
             if (!tempTable || !precipTable) return;
 
             p.background(255);
-            p.push();
-            p.rotateY(p.frameCount * 0.01);
-            p.rotateX(-0.2); // Slight tilt to see the floor
 
+            const w = manager.width;
+            const h = manager.height;
             const rowCount = tempTable.getRowCount();
-            const size = 300; // The bounding box size for our graph
 
-            // Draw Axes for reference
+            // --- Rotation Logic ---
+            // p.frameCount makes it animate over time
+            let rotAngle = p.frameCount * 0.01;
+            let viewScale = 0.6;
+
+            // Helper function for 3D rotation and projection in 2D space
+            const project = (x3d, y3d, z3d) => {
+                // 1. Center the data (assuming a 300x300x300 cube)
+                let cx = x3d - 150;
+                let cy = y3d - 150;
+                let cz = z3d - 150;
+
+                // 2. Rotate around the Y-axis (Standard Rotation Matrix)
+                let rotX = cx * p.cos(rotAngle) - cz * p.sin(rotAngle);
+                let rotZ = cx * p.sin(rotAngle) + cz * p.cos(rotAngle);
+
+                // 3. Project to 2D Screen Coordinates
+                let screenX = (w / 2) + (rotX * viewScale);
+                let screenY = (h / 2) + (cy * viewScale);
+
+                return { x: screenX, y: screenY };
+            };
+
+            // --- Draw Axes ---
             p.stroke(200);
-            p.line(-size / 2, size / 2, -size / 2, size / 2, size / 2, -size / 2); // X
-            p.line(-size / 2, size / 2, -size / 2, -size / 2, -size / 2, -size / 2); // Y
-            p.line(-size / 2, size / 2, -size / 2, -size / 2, size / 2, size / 2); // Z
+            p.strokeWeight(1);
+            let origin = project(0, 0, 0);
+            let xAxis = project(300, 0, 0);
+            let yAxis = project(0, 300, 0);
+            let zAxis = project(0, 0, 300);
 
+            p.line(origin.x, origin.y, xAxis.x, xAxis.y); // Year
+            p.line(origin.x, origin.y, yAxis.x, yAxis.y); // Precip
+            p.line(origin.x, origin.y, zAxis.x, zAxis.y); // Temp
+
+            p.fill(100);
+            p.noStroke();
+            p.text("Year", xAxis.x, xAxis.y);
+            p.text("Precipitation", yAxis.x, yAxis.y);
+            p.text("Temperature", zAxis.x, zAxis.y);
+
+            // --- Draw the 3D Line ---
             p.noFill();
             p.strokeWeight(2);
             p.beginShape();
@@ -28,38 +62,27 @@
                 let dateStr = tempTable.getString(i, 0);
                 if (!dateStr) continue;
 
-                let dateParts = dateStr.split('-');
-                let year = parseInt(dateParts[1]);
+                let year = parseInt(dateStr.split('-')[1]);
                 let tempF = tempTable.getNum(i, 1);
                 let precipInches = precipTable.getNum(i, 1);
 
-                // Map raw data to 3D coordinate space
-                // X: Year (Mapped from left to right)
-                let x = p.map(year, 1895, 2026, -size / 2, size / 2);
+                // Map raw data to the 300-unit virtual cube
+                let x3 = p.map(year, 1895, 2026, 0, 300);
+                let y3 = p.map(precipInches, 0, 80, 300, 0);
+                let z3 = p.map(tempF, 35, 75, 0, 300);
 
-                // Y: Precipitation (Mapped bottom to top)
-                let y = p.map(precipInches, 0, 80, size / 2, -size / 2);
+                let pos = project(x3, y3, z3);
 
-                // Z: Temperature (Mapped front to back)
-                let z = p.map(tempF, 35, 75, -size / 2, size / 2);
-
-                if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
-                    // Change color dynamically based on temperature
-                    let colAmt = p.map(tempF, 40, 70, 0, 1);
+                if (!isNaN(pos.x) && !isNaN(pos.y)) {
+                    // Change color based on Temperature (Z-axis)
+                    let colAmt = p.map(tempF, 45, 65, 0, 1);
                     let c = p.lerpColor(p.color(0, 100, 255), p.color(255, 50, 0), p.constrain(colAmt, 0, 1));
-                    p.stroke(c);
 
-                    p.vertex(x, y, z);
+                    p.stroke(c);
+                    p.vertex(pos.x, pos.y);
                 }
             }
             p.endShape();
-            p.pop();
-
-            p.fill(0);
-            p.noStroke();
-            p.textSize(16);
-            p.textAlign(p.LEFT, p.TOP);
-            p.text("3D Climate Path: X=Year, Y=Precip, Z=Temp", -p.width / 2 + 20, -p.height / 2 + 20);
         }
     };
 })();
