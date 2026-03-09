@@ -2,80 +2,69 @@
     window.sonoma_heatmap = {
         draw: function (p, manager, ai, progress) {
             let tempTable = manager.tempTable;
-            let precipTable = manager.precipTable;
-            console.log("Avg Temp Table: ", tempTable);
-            console.log("Avg Precip Table: ", precipTable);
-
-            if (!tempTable || !precipTable) return;
+            if (!tempTable || tempTable.getRowCount() === 0) return;
 
             p.background(255);
 
-            const margin = 60;
+            const margin = 80;
             const w = manager.width - margin * 2;
             const h = manager.height - margin * 2;
 
             const rowCount = tempTable.getRowCount();
 
+            // Calculate grid dimensions
+            const numYears = 2026 - 1895 + 1;
+            const cellW = w / numYears;
+            const cellH = h / 12;
+
             p.push();
             p.translate(margin, margin);
 
             for (let i = 0; i < rowCount; i++) {
-                // Extract Year from Date (e.g., "01-1895")
                 let dateStr = tempTable.getString(i, 0);
                 if (!dateStr) continue;
 
                 let dateParts = dateStr.split('-');
+                let month = parseInt(dateParts[0]);
                 let year = parseInt(dateParts[1]);
-
-                // Extract Values
                 let tempF = tempTable.getNum(i, 1);
-                // Use i to match the row in precipTable
-                let precipInches = precipTable.getNum(i, 1);
 
-                // 4. Mapping
-                // If year is 1895, x will be 0. If year is NaN, x will be NaN.
+                // X position based on Year
                 let x = p.map(year, 1895, 2026, 0, w);
+                // Y position based on Month (1 at top, 12 at bottom)
+                let y = p.map(month, 1, 12, 0, h - cellH);
 
-                // Safety: If precip is unexpectedly high, map it to the top of the chart
-                let y = p.map(precipInches, 30, 60, h, 0);
+                let amt = p.map(tempF, 30, 75, 0, 1);
+                amt = p.constrain(amt, 0, 1);
 
-                // 5. Draw
-                if (!isNaN(x) && !isNaN(y)) {
-                    let cBlue = p.color(0, 0, 255, 180);   // Cold
-                    let cWhite = p.color(255, 255, 255, 180); // Neutral
-                    let cRed = p.color(255, 0, 0, 180);    // Hot
+                let cBlue = p.color(0, 50, 255);
+                let cWhite = p.color(240, 240, 240);
+                let cRed = p.color(255, 20, 0);
 
-                    let amt = p.map(tempF, 35, 65, 0, 1);
-                    amt = p.constrain(amt, 0, 1);
-
-                    let col;
-                    if (amt < 0.5) {
-                        // First half: Blue to White
-                        let inter = p.map(amt, 0, 0.5, 0, 1);
-                        col = p.lerpColor(cBlue, cWhite, inter);
-                    } else {
-                        // Second half: White to Red
-                        let inter = p.map(amt, 0.5, 1, 0, 1);
-                        col = p.lerpColor(cWhite, cRed, inter);
-                    }
-
-                    p.fill(col);
-                    p.noStroke();
-                    p.stroke(0, 50);
-                    p.strokeWeight(0.5);
-                    p.ellipse(x, y, 5, 5);
+                let col;
+                if (amt < 0.5) {
+                    col = p.lerpColor(cBlue, cWhite, p.map(amt, 0, 0.5, 0, 1));
+                } else {
+                    col = p.lerpColor(cWhite, cRed, p.map(amt, 0.5, 1, 0, 1));
                 }
+
+                // 3. Draw the "Cell"
+                p.fill(col);
+                p.noStroke();
+                p.rect(x, y, cellW + 0.5, cellH + 0.5);
             }
 
-            // 5. Draw Labels
+            // 4. Labels
             p.fill(0);
-            p.textAlign(p.CENTER);
-            p.textSize(12);
-            p.text("Year (1895 - 2026)", w / 2, h + 35);
+            p.textAlign(p.CENTER, p.TOP);
+            p.text("1895", 0, h + 10);
+            p.text("2026", w, h + 10);
+            p.text("Year", w/2, h + 25);
 
-            p.push();
-            p.rotate(-p.HALF_PI);
-            p.text("Precipitation (Inches)", -h / 2, -40);
+            p.textAlign(p.RIGHT, p.CENTER);
+            p.text("Jan", -10, cellH/2);
+            p.text("Dec", -10, h - cellH/2);
+
             p.pop();
         }
     };
