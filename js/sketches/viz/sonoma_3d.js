@@ -13,7 +13,12 @@
             const rowCount = tempTable.getRowCount();
 
             // --- Configuration ---
-            let rotAngle = p.frameCount * 0.01;
+            // Only update the frame count if the space bar (key code 32) is NOT pressed
+            if (!p.keyIsDown(32)) {
+                this.currentFrame = (this.currentFrame || 0) + 1;
+            }
+
+            let rotAngle = (this.currentFrame || 0) * 0.01;
             let viewScale = 0.7;
             const boxSize = 300;
             const halfBox = boxSize / 2;
@@ -72,7 +77,7 @@
             let tStart = project(0, boxSize + 20, 0);
             let tEnd = project(0, boxSize + 20, boxSize);
             p.text("35°F", tStart.x - 20, tStart.y + 10);
-            p.text("50.1°F", tEnd.x, tEnd.y + 10); // Updated z-axis label
+            p.text("50.1°F", tEnd.x, tEnd.y + 10);
 
             // --- 3. Main Axis Titles ---
             p.textSize(14);
@@ -104,12 +109,11 @@
 
                 let x3 = p.map(year, 1895, 2026, 0, boxSize);
                 let y3 = p.map(precipInches, 0, 80, boxSize, 0);
-                let z3 = p.map(tempF, 35, 50.1, 0, boxSize); // Updated z-axis mapping
+                let z3 = p.map(tempF, 35, 50.1, 0, boxSize);
 
                 let pos = project(x3, y3, z3);
 
                 if (lastPos && !isNaN(pos.x) && !isNaN(pos.y)) {
-                    // Fixed Color: Segment-based stroke for gradient effect
                     let colAmt = p.map(tempF, 35, 50.1, 0, 1);
                     let c = p.lerpColor(p.color(0, 100, 255), p.color(255, 50, 0), p.constrain(colAmt, 0, 1));
 
@@ -117,6 +121,13 @@
                     p.line(lastPos.x, lastPos.y, pos.x, pos.y);
                 }
                 lastPos = pos;
+            }
+
+            // Pause Indicator
+            if (p.keyIsDown(32)) {
+                p.fill(0, 150);
+                p.noStroke();
+                p.text("PAUSED", w - 50, 30);
             }
         }
     };
