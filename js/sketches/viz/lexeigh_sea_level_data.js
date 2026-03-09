@@ -1,28 +1,26 @@
 (function () {
-    window.Amber_AvgTemp = {
+    window.lexeigh_sea_level = {
         draw: function (p, manager, ai, progress) {
-            let table = manager.avgTempTable;
-            console.log("Avg Temp Table: ", table);
+            let table = manager.seaLevelTable;
+            console.log("Avg Sea Level Table: ", table);
             console.log(manager.width, manager.height);
 
             const margin = 60;
-            const w = manager.width - margin * 2 + 90;
+            const w = manager.width - margin * 2 + 50;
             const h = manager.height - margin * 2;
 
             const numberOfRows = table.getRowCount();
             const numberOfCols = table.getColumnCount();
             let years = [];
-            let tempF = [];
-            let tempC = [];
+            let seaLevel = [];
 
             for (let i = 0; i < numberOfRows; i++) {
-                years[i] = table.getString(i, 0);
-                tempF[i] = table.getNum(i, 1);
-                tempC[i] = table.getNum(i, 3);
+                years[i] = table.getNum(i, 1);
+                seaLevel[i] = table.getNum(i, 7);
             }
 
-            const minTempF = Math.min(...tempF) - 0.2;
-            const maxTempF = Math.max(...tempF) + 0.2;
+            const minSeaLevel = Math.min(...seaLevel) - 0.2;
+            const maxSeaLevel = Math.max(...seaLevel) + 0.2;
 
             p.background(210);
             p.fill(0);
@@ -30,7 +28,7 @@
             p.strokeWeight(0.7);
             p.textSize(16);
             p.textAlign(p.CENTER, p.CENTER);
-            p.text("Long-Term Warming Trend in Washington State (1895-2026)", manager.width / 2, 30);
+            p.text("Sea Level in Washington from 1899 to 2026", manager.width / 2, 30);
 
             // draw axes
             p.line(margin, margin, margin, margin + h);
@@ -38,10 +36,10 @@
 
             // draw y-ticks and scale
             let numYTicks = 14;
-            let range = maxTempF - minTempF;
+            let range = maxSeaLevel - minSeaLevel;
             for (let i = 0; i <= numYTicks; i++) {
                 let t = i / numYTicks;
-                let value = minTempF + t * range;
+                let value = minSeaLevel + t * range;
                 let y = margin + h - t * h;
 
                 p.strokeWeight(0.1);
@@ -59,9 +57,9 @@
             p.strokeWeight(1);
             for (let i = 0; i < numberOfRows; i++) {
                 let x1 = margin + (i / (numberOfRows - 1)) * w;
-                let y1 = margin + h - ((tempF[i] - minTempF) / (maxTempF - minTempF)) * h;
+                let y1 = margin + h - ((seaLevel[i] - minSeaLevel) / (maxSeaLevel - minSeaLevel)) * h;
                 let x2 = margin + ((i + 1) / (numberOfRows - 1)) * w;
-                let y2 = margin + h - ((tempF[i + 1] - minTempF) / (maxTempF - minTempF)) * h;
+                let y2 = margin + h - ((seaLevel[i + 1] - minSeaLevel) / (maxSeaLevel - minSeaLevel)) * h;
                 p.line(x1, y1, x2, y2);
             }
 
@@ -79,15 +77,13 @@
             // draw x- and y-labels
             p.push();
 
-            p.textSize(13);
             p.translate(margin - 45, margin + h / 2);
             p.rotate(-p.HALF_PI);
             p.textAlign(p.CENTER, p.CENTER);
-            p.text("Temperature (°F)", 0, 0);
+            p.text("Sea Level (M)", 0, 0);
 
             p.pop();
 
-            p.textSize(13);
             p.textAlign(p.CENTER, p.BOTTOM);
             p.text("Year", margin + w / 2, margin + h + 35);
 
