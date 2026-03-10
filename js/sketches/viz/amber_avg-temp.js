@@ -6,7 +6,8 @@
             console.log(manager.width, manager.height);
 
             const margin = 60;
-            const w = manager.width - margin * 2 + 90;
+            const rightMargin = 180;
+            const w = manager.width - margin - rightMargin + 90;
             const h = manager.height - margin * 2;
 
             const numberOfRows = table.getRowCount();
@@ -122,6 +123,23 @@
             p.textAlign(p.CENTER, p.BOTTOM);
             p.text("Year", margin + w / 2, margin + h + 35);
 
+            // draw legend
+            let lx = margin + w + 35;
+            let ly = margin + 10;
+
+            p.noStroke();
+            p.fill(80, 120, 200);
+            p.rect(lx, ly, 20, 3);
+            p.fill(0);
+            p.textSize(11);
+            p.textAlign(p.LEFT, p.CENTER);
+            p.text("Annual Avg Temp", lx + 25, ly + 1);
+
+            p.fill(220, 120, 30);
+            p.rect(lx, ly + 18, 20, 3);
+            p.fill(0);
+            p.text("10-Year Rolling Avg", lx + 25, ly + 19);
+
             if (hoverData) {
                 this.drawHoverBox(p, hoverData);
             }
@@ -152,7 +170,7 @@
             p.textStyle(p.NORMAL);
             p.text(`Annual Avg in Fahrenheit: ${data.tempF.toFixed(2)}°F`, x + 10, y + 30);
             p.text(`Annual Avg in Celcius: ${data.tempC.toFixed(2)}°C`, x + 10, y + 50);
-            p.text(`10yr Avg: ${data.rollingAvgF.toFixed(2)}°F`, x + 10, y + 70);
+            p.text(`10-Year Avg: ${data.rollingAvgF.toFixed(2)}°F`, x + 10, y + 70);
             p.pop();
         }
     };
