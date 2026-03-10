@@ -21,6 +21,10 @@
                 p.pop();
             } else if (ai === 1) { // abstract
                 p.image(manager.abstractImg, cx - 100, cy - 100, 500, 500);
+            } else if (ai === 2) { // story
+                p.image(manager.storyImg, cx - 100, cy - 100, 500, 500);
+            } else if (ai === 3) { // data
+                p.image(manager.dataImg, cx - 100, cy - 100, 400, 400);
             }
         }
     };
