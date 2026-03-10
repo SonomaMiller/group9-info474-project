@@ -34,7 +34,7 @@
             p.strokeWeight(0.7);
             p.textSize(16);
             p.textAlign(p.CENTER, p.CENTER);
-            p.text("Total July–August Precipitation Per Year (Dry Season) | Washington State, 1895–2026", margin + w / 2, 30);
+            p.text("Total July-August Precipitation Per Year (Dry Season) | Washington State, 1895-2026", margin + w / 2, 30);
 
             p.textSize(12);
             p.fill(80);
