@@ -19,7 +19,7 @@
                 p.textSize(48);
                 p.text('Washington Climate Trends', cx, cy);
                 p.pop();
-            } else if (ai === 1) {
+            } else if (ai === 1) { // abstract
                 p.image(manager.abstractImg, cx - 100, cy - 100, 500, 500);
             }
         }
