@@ -164,6 +164,15 @@
             p.fill(0);
             p.text("10-Year Rolling Avg", lx + 25, ly + 19);
 
+            p.stroke(150, 0, 80);
+            p.strokeWeight(1.2);
+            p.drawingContext.setLineDash([6, 4]);
+            p.line(lx, ly + 36, lx + 20, ly + 36);
+            p.drawingContext.setLineDash([]);
+            p.noStroke();
+            p.fill(0);
+            p.text("Linear Regression", lx + 25, ly + 37);
+
             if (hoverData) {
                 this.drawHoverBox(p, hoverData);
             }
