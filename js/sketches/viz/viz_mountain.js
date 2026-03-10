@@ -1,5 +1,5 @@
 (function () {
-    let currentYear = 0;   // floating point for smooth animation
+    let currentYear = 0;   
     let isPlaying = true;
 
     window.VizMountain = {
@@ -73,6 +73,15 @@
                 peakX, peakY,
                 snowLeftX, snowLineY,
                 snowRightX, snowLineY
+            );
+
+            // Year label
+            p.fill(0);
+            p.textSize(16);
+            p.text(
+                "Year: " + yearStart[yearIndex],
+                skyX + 10,
+                skyY + 20
             );
 
             p.pop();
