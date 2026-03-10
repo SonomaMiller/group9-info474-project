@@ -90,7 +90,7 @@
                     p.noStroke();
                     p.circle(px, py, hoverRadius);
 
-                    hoverData = { year: years[i], tempF: tempF[i], tempC: tempC[i], mX: p.mouseX, mY: p.mouseY };
+                    hoverData = { year: years[i], tempF: tempF[i], tempC: tempC[i], rollingAvgF: rollingAvgF[i], mX: p.mouseX, mY: p.mouseY };
                     break;
                 }
             }
@@ -129,8 +129,8 @@
         },
 
         drawHoverBox: function (p, data) {
-            let boxW = 120;
-            let boxH = 70;
+            let boxW = 200;
+            let boxH = 90;
             let x = data.mX + 10;
             let y = data.mY - boxH - 10;
 
@@ -150,8 +150,9 @@
             p.text(`Year: ${data.year}`, x + 10, y + 10);
 
             p.textStyle(p.NORMAL);
-            p.text(`${data.tempF.toFixed(2)}°F`, x + 10, y + 30);
-            p.text(`${data.tempC.toFixed(2)}°C`, x + 10, y + 50);
+            p.text(`Annual Avg in Fahrenheit: ${data.tempF.toFixed(2)}°F`, x + 10, y + 30);
+            p.text(`Annual Avg in Celcius: ${data.tempC.toFixed(2)}°C`, x + 10, y + 50);
+            p.text(`10yr Avg: ${data.rollingAvgF.toFixed(2)}°F`, x + 10, y + 70);
             p.pop();
         }
     };
