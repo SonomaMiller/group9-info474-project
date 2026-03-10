@@ -5,9 +5,9 @@
         setData: function (manager) {
             var self = this;
 
-            manager.abstractImg = manager.p5.loadImage('../../img/mt-rainier.jpeg');
-            manager.storyImg = manager.p5.loadImage('../../img/mt-washington.jpg');
-            manager.dataImg = manager.p5.loadImage('../../img/noaa_logo.png');
+            manager.abstractImg = manager.p5.loadImage('img/mt-rainier.jpeg');
+            manager.storyImg = manager.p5.loadImage('img/mt-washington.jpg');
+            manager.dataImg = manager.p5.loadImage('img/noaa_logo.png');
             manager.avgTempTable = manager.p5.loadTable('data/washington_avg_temp_clean.csv', 'csv', 'header');
             manager.tempTable = manager.p5.loadTable('data/temperature_clean.csv', 'csv', 'header');
             manager.precipTable = manager.p5.loadTable('data/precipitation_clean.csv', 'csv', 'header');
