@@ -34,7 +34,12 @@
             p.strokeWeight(0.7);
             p.textSize(16);
             p.textAlign(p.CENTER, p.CENTER);
-            p.text("Washington Dry Season Precipitation (Jul-Aug, 1895-2026)", manager.width / 2, 30);
+            p.text("Total July–August Precipitation Per Year (Dry Season) | Washington State, 1895–2026", margin + w / 2, 30);
+
+            p.textSize(12);
+            p.fill(80);
+            p.stroke(80);
+            p.text("Combined total precipitation (inches) for July & August only — Washington's dry season", margin + w / 2, 52);
 
             // draw axes
             p.line(margin, margin, margin, margin + h);
@@ -71,7 +76,7 @@
                     p.mouseX >= x && p.mouseX <= x + barW - 0.5 &&
                     p.mouseY >= yVal && p.mouseY <= yBase
                 ) {
-                    p.fill(240, 0, 0); // Highlight on hover
+                    p.fill(240, 0, 0, 150); // Highlight on hover
                     hoverData = { year: years[i], precip: dry[i], mX: p.mouseX, mY: p.mouseY };
                 } else {
                     p.fill(200, 120, 80, 200);
@@ -79,10 +84,7 @@
 
                 p.noStroke();
                 p.rect(x, yVal, barW - 0.5, yBase - yVal);
-
                 p.fill(200, 120, 80, 200);
-                p.noStroke();
-                p.rect(x, yVal, barW - 0.5, yBase - yVal);
             }
 
             // draw x-axis labels
