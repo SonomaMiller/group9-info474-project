@@ -14,12 +14,14 @@
             let years = [];
             let tempF = [];
             let tempC = [];
+            let rollingAvgF = [];
             let hoverData = null;
 
             for (let i = 0; i < numberOfRows; i++) {
                 years[i] = table.getString(i, 0);
                 tempF[i] = table.getNum(i, 1);
                 tempC[i] = table.getNum(i, 3);
+                rollingAvgF[i] = table.getNum(i, 2);
             }
 
             const minTempF = Math.min(...tempF) - 0.2;
@@ -55,7 +57,7 @@
                 p.stroke(0);
             }
 
-            // draw line
+            // draw avg temp line
             p.stroke(80, 120, 200);
             p.strokeWeight(1);
             for (let i = 0; i < numberOfRows; i++) {
@@ -63,6 +65,17 @@
                 let y1 = margin + h - ((tempF[i] - minTempF) / (maxTempF - minTempF)) * h;
                 let x2 = margin + ((i + 1) / (numberOfRows - 1)) * w;
                 let y2 = margin + h - ((tempF[i + 1] - minTempF) / (maxTempF - minTempF)) * h;
+                p.line(x1, y1, x2, y2);
+            }
+
+            // draw rolling avg temp line
+            p.stroke(220, 120, 30);
+            p.strokeWeight(2);
+            for (let i = 0; i < numberOfRows - 1; i++) {
+                let x1 = margin + (i / (numberOfRows - 1)) * w;
+                let y1 = margin + h - ((rollingAvgF[i] - minTempF) / (maxTempF - minTempF)) * h;
+                let x2 = margin + ((i + 1) / (numberOfRows - 1)) * w;
+                let y2 = margin + h - ((rollingAvgF[i + 1] - minTempF) / (maxTempF - minTempF)) * h;
                 p.line(x1, y1, x2, y2);
             }
 
