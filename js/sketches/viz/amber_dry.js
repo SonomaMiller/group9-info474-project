@@ -1,5 +1,5 @@
 (function () {
-    window.Amber_Precipitation = {
+    window.Amber_Dry = {
         draw: function (p, manager, ai, progress) {
 
             let table = manager.precipDrynessTable;

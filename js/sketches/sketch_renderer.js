@@ -38,7 +38,7 @@
             }
 
             if (ai == 5) {
-                window.Amber_Precipitation.draw(p, manager, ai, progress);
+                window.Amber_Dry.draw(p, manager, ai, progress);
                 return;
             }
 
