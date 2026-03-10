@@ -80,6 +80,30 @@
                 p.line(x1, y1, x2, y2);
             }
 
+            // draw Tableau linear regression trend line
+            const lrSlope = 0.01527;
+            const lrIntercept = 45.3364 - lrSlope * 1895;
+
+            // Robustly extract 4-digit year from whatever format the date string uses
+            let firstYear = parseInt(years[0]);
+            let lastYear = parseInt((years[numberOfRows - 1]));
+
+            console.log("LR first year:", firstYear, "last year:", lastYear); // debug
+
+            let lrY_start = lrSlope * firstYear + lrIntercept;
+            let lrY_end = lrSlope * lastYear + lrIntercept;
+
+            let lrX1 = margin;
+            let lrY1 = margin + h - ((lrY_start - minTempF) / (maxTempF - minTempF)) * h;
+            let lrX2 = margin + w;
+            let lrY2 = margin + h - ((lrY_end - minTempF) / (maxTempF - minTempF)) * h;
+
+            p.stroke(150, 0, 80);
+            p.strokeWeight(1.2);
+            p.drawingContext.setLineDash([6, 4]);
+            p.line(lrX1, lrY1, lrX2, lrY2);
+            p.drawingContext.setLineDash([]);
+
             // detect hover
             const hoverRadius = 6;
             for (let i = 0; i < numberOfRows; i++) {
