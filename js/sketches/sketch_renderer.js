@@ -5,6 +5,9 @@
         setData: function (manager) {
             var self = this;
 
+            manager.abstractImg = manager.p5.loadImage('../../img/mt-rainier.jpeg');
+            manager.storyImg = manager.p5.loadImage('../../img/mt-washington.jpg');
+            manager.dataImg = manager.p5.loadImage('../../img/noaa_logo.png');
             manager.avgTempTable = manager.p5.loadTable('data/washington_avg_temp_clean.csv', 'csv', 'header');
             manager.tempTable = manager.p5.loadTable('data/temperature_clean.csv', 'csv', 'header');
             manager.precipTable = manager.p5.loadTable('data/precipitation_clean.csv', 'csv', 'header');
@@ -27,7 +30,7 @@
             console.log("Active index ", ai)
             try { console.log('Renderer: delegating draw, ai=', ai); } catch (e) { }
 
-            if (ai === 0 || ai === 1) {
+            if (ai === 0 || ai === 1 || ai === 2 || ai === 3) {
                 window.VizTitle.draw(p, manager, ai, progress);
                 return;
             }
@@ -38,7 +41,7 @@
             }
 
             if (ai == 5) {
-                window.Amber_Precipitation.draw(p, manager, ai, progress);
+                window.Amber_Dry.draw(p, manager, ai, progress);
                 return;
             }
 

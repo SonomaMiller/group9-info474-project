@@ -1,5 +1,5 @@
 (function () {
-    window.Amber_Precipitation = {
+    window.Amber_Dry = {
         draw: function (p, manager, ai, progress) {
 
             let table = manager.precipDrynessTable;
@@ -21,6 +21,7 @@
 
             let years = Object.keys(yearly).map(y => parseInt(y)).sort((a, b) => a - b);
             let dry = [];
+            let hoverData = null;
             for (let i = 0; i < years.length; i++) dry[i] = yearly[years[i]];
 
             const numberOfRows = years.length;
@@ -33,7 +34,7 @@
             p.strokeWeight(0.7);
             p.textSize(16);
             p.textAlign(p.CENTER, p.CENTER);
-            p.text("Washington Dry Season Precipitation (Jul-Aug) 1895-2026", manager.width / 2, 30);
+            p.text("Washington Dry Season Precipitation (Jul-Aug, 1895-2026)", manager.width / 2, 30);
 
             // draw axes
             p.line(margin, margin, margin, margin + h);
@@ -64,6 +65,20 @@
                 let x = margin + (i / (numberOfRows - 1)) * w - barW / 2;
                 let yVal = margin + h - ((dry[i] - minVal) / (maxVal - minVal)) * h;
                 let yBase = margin + h;
+
+                // hover detection
+                if (
+                    p.mouseX >= x && p.mouseX <= x + barW - 0.5 &&
+                    p.mouseY >= yVal && p.mouseY <= yBase
+                ) {
+                    p.fill(240, 0, 0); // Highlight on hover
+                    hoverData = { year: years[i], precip: dry[i], mX: p.mouseX, mY: p.mouseY };
+                } else {
+                    p.fill(200, 120, 80, 200);
+                }
+
+                p.noStroke();
+                p.rect(x, yVal, barW - 0.5, yBase - yVal);
 
                 p.fill(200, 120, 80, 200);
                 p.noStroke();
@@ -98,6 +113,36 @@
             p.textAlign(p.CENTER, p.BOTTOM);
             p.text("Year", margin + w / 2, margin + h + 35);
 
+            if (hoverData) {
+                this.drawHoverBox(p, hoverData);
+            }
+        },
+
+        drawHoverBox: function (p, data) {
+            let boxW = 130;
+            let boxH = 55;
+            let x = data.mX + 10;
+            let y = data.mY - boxH - 10;
+
+            if (x + boxW > p.width) x = data.mX - boxW - 10;
+            if (y < 0) y = data.mY + 10;
+
+            p.push();
+            p.fill(255, 240);
+            p.stroke(0);
+            p.strokeWeight(1);
+            p.rect(x, y, boxW, boxH, 5);
+
+            p.noStroke();
+            p.fill(0);
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(12);
+            p.textStyle(p.BOLD);
+            p.text(`Year: ${data.year}`, x + 10, y + 10);
+
+            p.textStyle(p.NORMAL);
+            p.text(`Precipitation: ${data.precip.toFixed(2)}"`, x + 10, y + 30);
+            p.pop();
         }
     };
 })();
