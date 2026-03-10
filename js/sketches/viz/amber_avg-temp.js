@@ -14,6 +14,7 @@
             let years = [];
             let tempF = [];
             let tempC = [];
+            let hoverData = null;
 
             for (let i = 0; i < numberOfRows; i++) {
                 years[i] = table.getString(i, 0);
@@ -65,10 +66,27 @@
                 p.line(x1, y1, x2, y2);
             }
 
+            // detect hover
+            const hoverRadius = 6;
+            for (let i = 0; i < numberOfRows; i++) {
+                let px = margin + (i / (numberOfRows - 1)) * w;
+                let py = margin + h - ((tempF[i] - minTempF) / (maxTempF - minTempF)) * h;
+
+                if (Math.abs(p.mouseX - px) < hoverRadius && Math.abs(p.mouseY - py) < hoverRadius) {
+                    p.fill(255, 0, 0);
+                    p.noStroke();
+                    p.circle(px, py, hoverRadius);
+
+                    hoverData = { year: years[i], tempF: tempF[i], tempC: tempC[i], mX: p.mouseX, mY: p.mouseY };
+                    break;
+                }
+            }
+
             // draw x scale
             // don't know if I want ticks here.
             for (let i = 0; i < numberOfRows; i += 10) {
                 let x = margin + (i / (numberOfRows - 1)) * w;
+                p.fill(0);
                 p.noStroke();
                 p.strokeWeight(0.1);
                 p.textSize(10);
@@ -91,6 +109,37 @@
             p.textAlign(p.CENTER, p.BOTTOM);
             p.text("Year", margin + w / 2, margin + h + 35);
 
+            if (hoverData) {
+                this.drawHoverBox(p, hoverData);
+            }
+
+        },
+
+        drawHoverBox: function (p, data) {
+            let boxW = 120;
+            let boxH = 70;
+            let x = data.mX + 10;
+            let y = data.mY - boxH - 10;
+
+            if (x + boxW > p.width) x = data.mX - boxW - 10;
+
+            p.push();
+            p.fill(255, 240);
+            p.stroke(0);
+            p.strokeWeight(1);
+            p.rect(x, y, boxW, boxH, 5);
+
+            p.noStroke();
+            p.fill(0);
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(12);
+            p.textStyle(p.BOLD);
+            p.text(`Year: ${data.year}`, x + 10, y + 10);
+
+            p.textStyle(p.NORMAL);
+            p.text(`${data.tempF.toFixed(2)}°F`, x + 10, y + 30);
+            p.text(`${data.tempC.toFixed(2)}°C`, x + 10, y + 50);
+            p.pop();
         }
     };
 })();
