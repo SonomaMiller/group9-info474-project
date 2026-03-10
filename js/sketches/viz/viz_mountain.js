@@ -21,21 +21,21 @@
 
             // Create button only once, but append only if mountain is visible
             if (!buttonCreated) {
-                const visContainer = document.getElementById("vis");
-                if (visContainer) {
-                    btn = document.createElement("button");
-                    btn.innerHTML = "Show El Nino vs La Nina";
-                    btn.style.position = "absolute";
-                    btn.style.top = "60px";
-                    btn.style.right = "70px";
-                    btn.style.zIndex = "1000";
+                btn = document.createElement("button");
+                btn.innerHTML = "Show El Nino vs La Nina";
+                btn.style.marginTop = "10px"; // optional: spacing from text
 
-                    btn.onclick = function () {
-                        showClimate = !showClimate;
-                    };
+                btn.onclick = function () {
+                    showClimate = !showClimate;
+                };
 
-                    buttonCreated = true;
+                // Append button to the text section instead of #vis
+                const textSection = document.querySelector('section.step[data-active-index="7"]'); 
+                if (textSection) {
+                    textSection.appendChild(btn);
                 }
+
+                buttonCreated = true;
             }
 
             // Append or remove button based on mountain visibility
