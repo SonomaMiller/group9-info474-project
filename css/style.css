@@ -1,3 +1,7 @@
+body {
+  background-color: #f5f0e8;
+  color: #2c2c2c;
+}
 
 .container {
   width: 890px;
@@ -22,7 +26,7 @@
   font-family: "TiemposTextWeb-Regular","Georgia";
   font-size: 16px;
   line-height: 23px;
-  color: #767678;
+  color: #5a5040;
 }
 
 #sections .title {
@@ -30,8 +34,9 @@
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 2px;
-  color: #262626;
+  color: #3b2f1e;
   line-height: 1.2em;
+  letter-spacing: 0.01em;
 }
 
 #extra-space {
