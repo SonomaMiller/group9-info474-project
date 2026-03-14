@@ -23,7 +23,7 @@
             if (!buttonCreated) {
                 btn = document.createElement("button");
                 btn.innerHTML = "Show El Nino vs La Nina";
-                btn.style.marginTop = "10px"; // optional: spacing from text
+                btn.style.marginTop = "10px"; 
 
                 btn.onclick = function () {
                     showClimate = !showClimate;
@@ -77,6 +77,7 @@
             if (yearIndex >= yearStart.length) return;
 
             const currentSnow = snowPack[yearIndex] || 0;
+            const snowLabel = currentSnow;
 
             p.push();
 
@@ -117,9 +118,11 @@
             p.textSize(16);
             p.text("Year: " + String(yearStart[yearIndex]), skyX + 10, skyY + 20);
 
+            p.text("Snowpack: " + snowLabel + " feet", skyX + 10, skyY + 40);
+
             if (showClimate) {
                 const climateLabel = laNina[yearIndex] ? "La Nina" : "El Nino";
-                p.text("Climate: " + String(climateLabel), skyX + 10, skyY + 40);
+                p.text("Climate: " + String(climateLabel), skyX + 10, skyY + 60);
             }
 
             p.pop();
